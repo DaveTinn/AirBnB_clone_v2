@@ -12,16 +12,17 @@ from models.review import Review
 from models.state import State
 from models.amenity import Amenity
 from models.user import User
+import os
 
 
 my_classes = {"City": City, "Place": Place, "Review": Review,
               "State": State, "Amenity": Amenity, "USer": User}
 
 
-class DBStorage():
+class DBStorage:
     """Instantiates a class DBStorage."""
-    self.__engine = None
-    self.__session = None
+    __engine = None
+    __session = None
 
     def __init__(self):
         """Initializes the DBStorage instance."""
@@ -52,7 +53,7 @@ class DBStorage():
             objects_dict = {}
 
             if cls is None:
-                for class in my_classes:
+                for my_class in my_classes:
                     objects = self.__session.query(my_class).all()
                     for obj in objects:
                         objects_dict[obj] = obj
