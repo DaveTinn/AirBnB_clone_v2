@@ -19,5 +19,6 @@ def do_pack():
         archname = "versions/web_static_{}.tgz".format(timenow)
         local("tar -cvzf {} web_static/".format(archname))
         return archname
-    except:
+    except Exception as e:
+        print("Error", e)
         return None
