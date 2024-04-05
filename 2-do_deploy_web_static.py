@@ -7,7 +7,7 @@ an archive to web_server using do_deploy.
 from fabric.api import env, put, run
 import os.path
 
-env.hosts = ['54.158.182.245, 54.146.93.24']
+env.hosts = ['54.158.182.245', '54.146.93.24']
 env.user = 'ubuntu'
 
 
@@ -20,6 +20,7 @@ def do_deploy(archive_path):
         no_exten = filename.split(".")[0]
         path = "/data/web_static/releases/{}/".format(no_exten)
         sym_ln = "/data/web_static/current"
+        # Upload archive to the /tmp/ dir on the web server
         put(archive_path, "/tmp/")
         run("mkdir -p {}".format(path))
         run("tar -xzf /tmp/{} -C {}".format(filename, path))
@@ -28,6 +29,7 @@ def do_deploy(archive_path):
         run("rm -rf {}web_static".format(path))
         run("rm -rf {}".format(sym_ln))
         run("ln -s {} {}".format(path, sym_ln))
+        print("New version deployed!")
         return True
     except ValueError:
         return False 
