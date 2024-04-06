@@ -20,7 +20,7 @@ def do_pack():
         arc_name = "versions/web_static_{}.tgz".format(timenow)
         local("tar -cvzf {} web_static".format(arc_name))
         print('web_static packed: {} -> {}Bytes'.format(arc_name,
-            os.path.getsize(arc_name)))
+              os.path.getsize(arc_name)))
         return arc_name
     except:
         return None
