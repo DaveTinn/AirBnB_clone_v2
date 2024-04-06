@@ -8,11 +8,10 @@ from fabric.api import env, put, run
 import os.path
 
 env.hosts = ['54.158.182.245', '54.146.93.24']
-env.user = 'ubuntu'
 
 
 def do_deploy(archive_path):
-    if not os.path.isfile(archive_path):
+    if os.path.isfile(archive_path) is False:
         return False
     try:
         # Extracts file and dir name without ext.

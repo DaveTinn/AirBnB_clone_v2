@@ -7,6 +7,7 @@ form the contents of the web_static folder.
 
 from fabric.api import local
 from time import strftime
+import os
 
 
 def do_pack():
@@ -18,9 +19,8 @@ def do_pack():
         local("mkdir -p versions")
         arc_name = "versions/web_static_{}.tgz".format(timenow)
         local("tar -cvzf {} web_static".format(arc_name))
-        arc_size = local('stat -c%s {}'.format(arc_name), capture=True)
-        print('web_static packed: {} -> {}Bytes'.format(arc_name, arc_size))
+        print('web_static packed: {} -> {}Bytes'.format(arc_name,
+            os.path.getsize(arc_name)))
         return arc_name
-    except Exception as e:
-        print("Error", e)
+    except:
         return None

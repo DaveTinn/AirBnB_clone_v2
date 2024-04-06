@@ -73,6 +73,7 @@ class DBStorage:
         """Delete from the current database session."""
         if obj is not None:
             self.__session.delete(obj)
+            self.save()
 
     def reload(self):
         """Creates all tables in the database."""
@@ -85,3 +86,8 @@ class DBStorage:
         # Create a database Session and make it thread-safe
         Session = scoped_session(Session_factory)
         self.__session = Session()
+
+    def close(self):
+        """Closes the session."""
+        if self.__session:
+            sef.__session.close()

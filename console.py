@@ -3,7 +3,6 @@
 import cmd
 import sys
 from models.base_model import BaseModel
-from models.__init__ import storage
 from models.user import User
 from models.place import Place
 from models.state import State
@@ -75,7 +74,7 @@ class HBNBCommand(cmd.Cmd):
                 pline = pline[2].strip()  # pline is now str
                 if pline:
                     # check for *args or **kwargs
-                    if pline[0] is '{' and pline[-1] is'}'\
+                    if pline[0] == '{' and pline[-1] == '}'\
                             and type(eval(pline)) is dict:
                         _args = pline
                     else:
@@ -134,7 +133,7 @@ class HBNBCommand(cmd.Cmd):
                         continue
                     kwargs[key] = value
 
-                if kwargs {}:
+                if kwargs == {}:
                     my_obj = eval(args_list[0])()
                 else:
                     my_obj = eval(args_list[0])(**kwargs)
@@ -142,10 +141,10 @@ class HBNBCommand(cmd.Cmd):
                 print(my_obj.id)
                 my_obj.save()
 
-            except SyntaxError:
-                print("** class nmae missing **")
-            except NameError:
-                print("** class doesn't exist **")
+        except SyntaxError:
+            print("** class nmae missing **")
+        except NameError:
+            print("** class doesn't exist **")
 
     def help_create(self):
         """ Help information for the create method """
@@ -272,7 +271,7 @@ class HBNBCommand(cmd.Cmd):
                 raise ValueError()
             value = my_objects[key]
             try:
-                value.__dict__[args_list[2]] eval(args_list[3])
+                value.__dict__[args_list[2]] = eval(args_list[3])
             except Exception:
                 value.__dict__[args_list[2]] = args_list[3]
                 value.save()
@@ -288,6 +287,72 @@ class HBNBCommand(cmd.Cmd):
             print("** attribute name missing **")
         except ValueError:
             print("** value missing **")
+
+    def count(self, args):
+        """count the number of instances of a class
+        """
+        counter = 0
+        try:
+            my_list = split(args, " ")
+            if my_list[0] not in self.__classes:
+                raise NameError()
+            objects = storage.all()
+            for key in objects:
+                name = key.split('.')
+                if name[0] == my_list[0]:
+                    counter += 1
+            print(counter)
+        except NameError:
+            print("** class doesn't exist **")
+
+    def strip_clean(self, args):
+        """strips the argument and return a string of command
+        Args:
+            args: input list of args
+        Return:
+            returns string of argumetns
+        """
+        new_list = []
+        new_list.append(args[0])
+        try:
+            my_dict = eval(
+                args[1][args[1].find('{'):args[1].find('}')+1])
+        except Exception:
+            my_dict = None
+        if isinstance(my_dict, dict):
+            new_str = args[1][args[1].find('(')+1:args[1].find(')')]
+            new_list.append(((new_str.split(", "))[0]).strip('"'))
+            new_list.append(my_dict)
+            return new_list
+        new_str = args[1][args[1].find('(')+1:args[1].find(')')]
+        new_list.append(" ".join(new_str.split(", ")))
+        return " ".join(i for i in new_list)
+
+    def default(self, line):
+        """retrieve all instances of a class and
+        retrieve the number of instances
+        """
+        my_list = line.split('.')
+        if len(my_list) >= 2:
+            if my_list[1] == "all()":
+                self.do_all(my_list[0])
+            elif my_list[1] == "count()":
+                self.count(my_list[0])
+            elif my_list[1][:4] == "show":
+                self.do_show(self.strip_clean(my_list))
+            elif my_list[1][:7] == "destroy":
+                self.do_destroy(self.strip_clean(my_list))
+            elif my_list[1][:6] == "update":
+                args = self.strip_clean(my_list)
+                if isinstance(args, list):
+                    obj = storage.all()
+                    key = args[0] + ' ' + args[1]
+                    for k, v in args[2].items():
+                        self.do_update(key + ' "{}" "{}"'.format(k, v))
+                else:
+                    self.do_update(args)
+        else:
+            cmd.Cmd.default(self, line)
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
